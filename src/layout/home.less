@@ -1,0 +1,45 @@
+.home-page {
+    
+    position: absolute;
+    width: 100%;
+    height: 100%;
+
+    .flex { 
+        padding-top: 30px;
+        display: -webkit-box;
+        display: -moz-box;
+        display: -ms-flexbox;
+        display: -webkit-flex;
+        display: flex;
+    }
+    
+    .flex-child {
+        -webkit-box-flex: 1 1 auto;
+        -moz-box-flex:  1 1 auto;
+        -webkit-flex:  1 1 auto;
+        -ms-flex:  1 1 auto;
+        flex:  1 1 auto;
+        margin-right:5px;
+    }
+
+    .chatroom {
+        height: 100%;
+        width: 100%;
+        display: flex;
+        border: 1px solid #4CAF50;
+        .room-list{
+            width:20%;
+            height: 100%;
+            border: 1px solid #4CAF50;
+
+        }
+        .room-window{
+            flex:1;
+            height:100%;
+        }
+    }
+
+
+      
+    
+}

@@ -247,7 +247,7 @@ class Login extends React.Component<IProps,IState>{
                                         className="input"
                                         value={formLogin.userName}
                                         onChange={(e:any)=>this.handleChangeInput(e,1)}
-                                        placeholder="input email/phone"
+                                        placeholder="input email"
                                     />
                                     <Input
                                     type="password"
@@ -275,7 +275,7 @@ class Login extends React.Component<IProps,IState>{
                                         className="input"
                                         value={ formRegister.userName }
                                         onChange={ (e: any) => this.handleChangeRegister(e, 1) }
-                                        placeholder="input email/phone"
+                                        placeholder="input email"
                                     />
                                     <Input
                                         type="password"
