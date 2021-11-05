@@ -6,9 +6,9 @@ import logo from "@/assets/uu.jpg";
 import '@/layout/home.less';
 import MessageInput from '@/components/MessageInput';
 import Message from '@/components/Message';
-import { StopOutlined, CloseCircleOutlined, UserOutlined } from '@ant-design/icons';
-//import io from 'socket.io-client'
-//import { ServerResponse } from 'http';
+
+import io from 'socket.io-client'
+import { ServerResponse } from 'http';
 
 const { Panel } = Collapse;
 

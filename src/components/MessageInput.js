@@ -22,13 +22,16 @@ function onSearch(val) {
 }
 
 const NewMessage = ({socket}) => {
+  
   const [value, setValue] = useState('');
+ 
+ 
   const submitForm = (e) => {
     e.preventDefault();
-    socket.emit('chat', value);
+    socket(value);
     setValue('');
-  };
-
+  }
+  
   return (  
     <div className="chatroom-area-send-container">
       <div className="chatroom-area-send-user">
@@ -58,7 +61,10 @@ const NewMessage = ({socket}) => {
           setValue(e.currentTarget.value);
         }} />
     </div>
-  );
+
+    
+   );
+      
 };
 
 export default NewMessage;
