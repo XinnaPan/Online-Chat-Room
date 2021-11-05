@@ -9,6 +9,7 @@ import '@/layout/login.less';
 import { validUserName, validPass } from '@/utils/valid';
 import DocumentTitle from 'react-document-title';
 
+
 interface IProps {
     login:any,
     register: any,
@@ -45,9 +46,12 @@ class Login extends React.Component<IProps,IState>{
             },
             typeView:0,
             checked:false,
-            isLoading:false
+            isLoading:false,
+            
         }
     }
+
+
 
     setCookie= (user_name:string, user_pwd:string, exdays:number)=> {
         let exdate = new Date();

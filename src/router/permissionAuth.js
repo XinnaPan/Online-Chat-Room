@@ -8,7 +8,6 @@ export class PermissionAuth extends React.Component {
         const {pathname} = location;
         const isLogin = store.getState().user.data.token;
 
-        console.log(">>>>>>>>>>>>>>>",isLogin);
         const targetRouterConfig = config.find(v => v.path === pathname);
          if (targetRouterConfig && !targetRouterConfig.auth && !isLogin) {
              const { component } = targetRouterConfig;
