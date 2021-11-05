@@ -21,7 +21,7 @@ function onSearch(val) {
     console.log('search:', val);
 }
 
-const NewMessage = ({socket}) => {
+const NewMessage = ({socket,addUser}) => {
   
   const [value, setValue] = useState('');
  
@@ -31,6 +31,8 @@ const NewMessage = ({socket}) => {
     socket(value);
     setValue('');
   }
+
+
   
   return (  
     <div className="chatroom-area-send-container">
@@ -55,7 +57,6 @@ const NewMessage = ({socket}) => {
         </Select>
 
         <Button className="chatroom-area-send-button" type="primary" onClick={submitForm}>Send</Button>
-        <Button className="chatroom-area-invite-button" type="primary">Invite</Button>
       </div>
       <textarea className="chatroom-area-send-content" placeholder="type your message"  value={value} onChange={(e) => {
           setValue(e.currentTarget.value);
