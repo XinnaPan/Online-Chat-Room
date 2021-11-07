@@ -131,3 +131,13 @@ export function get_user_info(data) {
     }
   )
 }
+
+export function log_out(data) {
+  return network(
+    {
+      url:`/logout`,
+      method:"post",
+      data
+    }
+  )
+}

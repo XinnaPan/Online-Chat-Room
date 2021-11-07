@@ -1,5 +1,5 @@
 import{ saveUserInfo, clearUserInfo,saveUserJoinedRooms,saveNoInfo,saveUserInRoom } from './user';
-import{get_user_info,check_ban,check_user_admin,loginUser,registerUser,getJoinedRoomsById,create_new_room,join_a_room,connect_a_room,leave_a_room,get_all_rooms,leave_all_rooms,ban_user} from '@/utils/api';
+import{log_out,get_user_info,check_ban,check_user_admin,loginUser,registerUser,getJoinedRoomsById,create_new_room,join_a_room,connect_a_room,leave_a_room,get_all_rooms,leave_all_rooms,ban_user} from '@/utils/api';
 
 export const login = (username, password) => (dispatch) => {
     return new Promise((resolve,reject) => {
@@ -30,12 +30,29 @@ export const register = (username, password,age,school,interest) => (dispatch) =
         })
     })
 }
-
-export const logout = () => (dispatch) => {
+export const logout = (username,roomname,reason) => (dispatch) => {
     console.log('logout')
     dispatch(clearUserInfo());
-    window.location.herf = '/login';
+    window.location.href = '/login';
 }
+/*export const logout = (username,roomname,reason) => (dispatch) => {
+    console.log('logout');
+
+    /*log_out({userName:username,chatRoomName:roomname,reason:reason})
+        .then(res=>{
+            console.log('log out ===',res)
+            if(res.code === 0) {
+                dispatch(clearUserInfo());
+                resolve(res);
+            } else {
+                reject(res.msg);
+            }
+        })
+    dispatch(clearUserInfo());
+
+    window.location.herf = '/login';
+
+}*/
 
 export const getJoinedRooms = (userName)=>(dispatch) => {
     return new Promise((resolve,reject) => {

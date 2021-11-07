@@ -8,8 +8,10 @@ import MessageInput from '@/components/MessageInput';
 import Message from '@/components/Message';
 import { StopOutlined, CloseCircleOutlined, UserOutlined } from '@ant-design/icons';
 import {connect} from 'react-redux';
-import {getUserInfo,checkBan,banUser,CheckAdmin,getJoinedRooms,createNewRoom,GetRoomUser, JoinARoom,LeaveRoom,getRooms,LeaveAllRooms} from '@/redux/actions';
+import {logout,getUserInfo,checkBan,banUser,CheckAdmin,getJoinedRooms,createNewRoom,GetRoomUser, JoinARoom,LeaveRoom,getRooms,LeaveAllRooms} from '@/redux/actions';
 import store from "@/redux";
+import {validNumber} from "@/utils/valid"
+//import {logout} from "@/redux/actions"
 //import io from 'socket.io-client'
 //import { ServerResponse } from 'http';
 
@@ -19,7 +21,10 @@ const room_type = [
     { label: 'public', value: 'PUBLIC' },
     { label: 'private', value: 'PRIVATE' }
   ];
-const socketUrl = "http://localhost:9092"
+
+
+
+
 class Home extends React.Component<any,any> {
     formRef = React.createRef();
 
@@ -44,30 +49,31 @@ class Home extends React.Component<any,any> {
             userAdmin:false,
 
 
-            userName:'1',
-            userAge:'1',
-            userSchool:'1',
-            userInterest:'1'
+            userName:'',
+            userAge:'',
+            userSchool:'',
+            userInterest:''
         };
         
 
     }
 
-    /*content = (
-        <div>
-          <p>`Name: ${this.state.userName}`</p>
-          <p>`Age: ${this.state.userAge}`</p>
-          <p>`Schoole: ${this.state.userSchool}`</p>
-          <p>`Interest: ${this.state.userInterest}`</p>
-        </div>
-      );*/
+    handleRecall=(value)=>{
+        let mm=this.state.messages;
+        mm.splice(mm.indexOf(value),1);
+        this.setState({messages:mm});
+
+    }
+
+
       content =  () => {
           return (
               <div>
-                  <p>{this.state.userName}</p>
-                  <p>{this.state.userAge}</p>
-                  <p>{this.state.userSchool}</p>
-                  <p>{this.state.userInterest}</p>
+                <p>{`Name: ${this.state.userName}`}</p>
+                <p>{`Age: ${this.state.userAge}`}</p>
+                <p>{`Schoole: ${this.state.userSchool}`}</p>
+                <p>{`Interest: ${this.state.userInterest}`}</p>
+                
               </div>
           );
       }
@@ -81,7 +87,7 @@ class Home extends React.Component<any,any> {
                  this.setState({userName:datas.userName});
                  this.setState({userAge:datas.age});
                  this.setState({userSchoole:datas.school});
-                 this.setState({userInterest:datas.interest});
+                 this.setState({userInterest:eval(datas.interest)});
 
               }
           }).catch((error:any)=>{
@@ -91,8 +97,12 @@ class Home extends React.Component<any,any> {
       }
 
     componentWillMount() {
+        let name=JSON.parse((store.getState() as any).user.data.userData).userName;
+        console.log("get all joined rooms ===",name);
+        this.setState({user:name});
         this.SocketChatRoom();
         this.InitiateChatRoom();
+        this.getInfo(name);
     }
      setUpSession=(webSocket:any) => {
         let userName = JSON.parse((store.getState() as any).user.data.userData).userName;
@@ -111,15 +121,18 @@ class Home extends React.Component<any,any> {
             this.setState({room_notification:"No Room connected. Please Join a Room"})
 
     }
+    
 
     SocketChatRoom=()=> {
-        const webSocket = new WebSocket("ws://" + "localhost:4567" + "/chatapp" + "?userId=1");
+        const webSocket = new WebSocket('wss://unicorn-server.herokuapp.com/chatapp?userId=1');
         this.setState({webSocket:webSocket});
         this.setUpSession(webSocket);
         webSocket.onmessage = (msg) =>{this.handleMessageFromServer(msg);}//{console.log("msg from server===== ",msg);}//{this.store_messages(JSON.parse(msg.data))};//this.store_messages( JSON.parse(msg.data).userName + " leave the room");
+        
     }
 
     handleMessageFromServer=(msg)=>{
+        console.log(msg.timeStamp)
         const { topic, chatroom, sender,  messageType } = JSON.parse(msg.data)
         const mm=JSON.parse(msg.data).message
         console.log("msg from server===== ",msg);
@@ -128,10 +141,17 @@ class Home extends React.Component<any,any> {
             {
                 if (this.state.room_title === chatroom)
                     this.store_messages(sender + " says: " + mm);
-            } else if (topic === "ConnectRoom") //connectroom
+            } 
+            else if (topic === "SpecificMessage") //connectroom
             {
                 if (this.state.room_title === chatroom)
-                    this.store_messages(sender + " connects Room: " + chatroom);
+                    this.store_messages(sender + " says to you: " + mm);
+                else
+                    message.success(sender + " says to you in room " + chatroom +" that: "+mm);
+            }else if (topic === "ConnectRoom") //connectroom
+            {
+                if (this.state.room_title === chatroom)
+                    this.store_messages(sender + " connects room: " + chatroom);
             } else if(topic === "LeaveRoom")
             {
                 if(this.state.user === sender)
@@ -147,7 +167,7 @@ class Home extends React.Component<any,any> {
                 }
                 else if (this.state.room_title === chatroom)
                 {
-                    this.store_messages(sender + " leaves " + chatroom+","+ mm);
+                    this.store_messages(sender + " leaves room " + chatroom+". "+ mm);
                     let ir=this.state.inviteUserCardList;
                     let index = ir.indexOf(sender);
                     if (index > -1) {
@@ -213,20 +233,16 @@ class Home extends React.Component<any,any> {
         .then((res:any)=>{
             if(res.code === 0) {
                 message.success('init joined rooms success');
-                if (res.data !== "[]") {
+                let arr=eval(res.data);
+                if(arr!==""){
+
+               /* if (res.data !== "[]") {
                     let str = res.data;
                     let len = str.length;
                     str = str.substr(1, len - 2);
-                    let arr = str.split(",");
-                    let il = this.state.joinedRoomCardList;
-                   
-                    arr.forEach(a => {
-                        a=a.replace("\"","");
-                        a=a.replace("\"","");
+                    let arr = eval(str);*/
 
-                        il.push(a);
-                    });
-                    this.setState({ joinedRoomCardList: il })
+                    this.setState({ joinedRoomCardList: arr });
                 }
 
             }
@@ -239,22 +255,9 @@ class Home extends React.Component<any,any> {
         .then((res:any)=>{
             if(res.code === 0) {
                 message.success('init all rooms success');
-                if(res.data !== "[]")
-                {
-                    let str = res.data;
-                    let len = str.length;
-                    str = str.substr(1, len - 2);
-                    let arr = str.split(",");
-                    let il = this.state.allRoomCardList;
-
-
-                    arr.forEach(a => {
-                        a=a.replace("\"","");
-                        a=a.replace("\"","");
-
-                        il.push(a);
-                    });
-                    this.setState({ allRoomCardList: il })
+                let arr=eval(res.data);
+                if(arr!==""){
+                    this.setState({ allRoomCardList: arr })
                 }
 
             }
@@ -306,9 +309,15 @@ class Home extends React.Component<any,any> {
 
         let datajoinedRooms = this.state.joinedRoomCardList;
         datajoinedRooms.push(this.formRef.current.getFieldsValue().newchatroomName);
+        
 
         let infoNewRoom=this.formRef.current.getFieldsValue();
-        console.log(infoNewRoom.newchatroomType);
+        console.log(infoNewRoom.newchatroomType);        
+        if(!validNumber(infoNewRoom.newchatroomSize)) {
+            message.error('the size should be a number');
+            return false;
+        }
+        
         createNewRoom(infoNewRoom.newchatroomName,infoNewRoom.newchatroomType,
             infoNewRoom.newchatroomSize,infoNewRoom.newchatroomDescription,this.state.user)
         .then((res:any)=>{
@@ -337,7 +346,7 @@ class Home extends React.Component<any,any> {
         this.formRef.current.resetFields()
     }
     handleSendMessage=(value,user)=>{
-
+        if(this.state.room_title !==""){
         const {checkBan}=this.props;
 
         checkBan(this.state.user,this.state.room_title)
@@ -356,7 +365,9 @@ class Home extends React.Component<any,any> {
                 message.error(error);
         })
 
-
+    } else {
+        message.error("connect a room before sending.");
+    }
     }
     handleNewRoomCancel = () => {
         this.setState({
@@ -588,6 +599,22 @@ class Home extends React.Component<any,any> {
         });
     };
 
+    handle_logout = ()=>{
+        const{logout}=this.props;
+        logout(this.state.user,this.state.room_title,"user LogOut");
+        /*.then((res:any)=>{
+            store.dispatch(res)
+            message.success("log out success")
+        }
+        ).catch((error:any)=>{
+            message.error(error);
+
+        })*/
+        //store.dispatch(logout(this.state.user,this.state.room_title,"user LogOut"));
+    }
+
+
+
     render() {
         const { value_joined_rooms,value_all_rooms} = this.state;
         const { allRoomCardList, joinedRoomCardList, inviteUserCardList } = this.state;
@@ -603,10 +630,12 @@ class Home extends React.Component<any,any> {
                     <Menu key="1" mode="horizontal" className="home-menu">
                         <Menu.Item>
                             <img src={ logo } alt="logo"/>
-                            <span>Unicorn</span>
+                                <span>{`Welcome, ${this.state.user}`}</span>
                         </Menu.Item>
-                        <Menu.Item><Link to='/Profile'>Profile</Link></Menu.Item>
-                        <Menu.Item><Link to=''>Log Out</Link></Menu.Item>
+                        <Menu.Item><Popover content={this.content}>
+                            <Button>Profile</Button >
+                            </Popover></Menu.Item>
+                        <Menu.Item><Button onClick={()=>{this.handle_logout()}}>Log Out</Button></Menu.Item>
                     </Menu>
                 </div>
                 <div className="home-box">
@@ -766,7 +795,7 @@ class Home extends React.Component<any,any> {
                                 <h1 className="chatroom-area-notification-error">{this.state.room_title}</h1>
                                 <h5 className="chatroom-area-notification-error">{this.state.room_notification}</h5>
                             </div>
-                            <Message messages={this.state.messages} />
+                            <Message messages={this.state.messages} user={this.state.user} recall={this.handleRecall}/>
                             <MessageInput UserList={this.state.inviteUserCardList}socket={this.handleSendMessage} />
                         </Col>
                     </Row>
@@ -779,6 +808,6 @@ class Home extends React.Component<any,any> {
         
     }
 }
-export default connect((state: any) => state.user, {getUserInfo,checkBan, banUser,CheckAdmin,LeaveAllRooms,LeaveRoom,JoinARoom,getRooms,getJoinedRooms,createNewRoom,GetRoomUser })(Home)
+export default connect((state: any) => state.user, {logout,getUserInfo,checkBan, banUser,CheckAdmin,LeaveAllRooms,LeaveRoom,JoinARoom,getRooms,getJoinedRooms,createNewRoom,GetRoomUser })(Home)
 
 //export default Home;//

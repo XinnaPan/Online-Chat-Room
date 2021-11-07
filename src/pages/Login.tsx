@@ -6,7 +6,7 @@ import logo from "@/assets/uu.jpg";
 
 import {login,register} from '@/redux/actions';
 import '@/layout/login.less';
-import { validUserName, validPass } from '@/utils/valid';
+import { validNumber, validPass } from '@/utils/valid';
 import DocumentTitle from 'react-document-title';
 
 
@@ -138,6 +138,11 @@ class Login extends React.Component<IProps,IState>{
             return false;
         } else if(!validPass(formRegister.userPwd2) || (formRegister.userPwd2 !== formRegister.userPwd)) {
             message.error("pwd unmatch");
+            return false;
+        }
+
+        if(!validNumber(formRegister.userAge)) {
+            message.error('age should be number');
             return false;
         }
         register(
