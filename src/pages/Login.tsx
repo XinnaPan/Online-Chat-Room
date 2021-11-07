@@ -24,6 +24,9 @@ interface IState {
         userName?: string,
         userPwd2?: string,
         userPwd?: string,
+        userAge?: string,
+        userSchool?: string,
+        userInterest?: string
     },
     typeView: number,
     checked: boolean,
@@ -43,6 +46,10 @@ class Login extends React.Component<IProps,IState>{
                 userName:'',
                 userPwd2:'',
                 userPwd:'',
+                userAge:'',
+                userSchool:'',
+                userInterest:''
+
             },
             typeView:0,
             checked:false,
@@ -94,10 +101,7 @@ class Login extends React.Component<IProps,IState>{
         const {login,history} = this.props;
         const{formLogin,checked}=this.state;
 
-        if(!validUserName(formLogin.userName)) {
-            message.error('plz input correct email');
-            return false;
-        }
+
 
         if(!validPass(formLogin.userPwd)) {
             message.error('plz input correct pwd');
@@ -129,11 +133,8 @@ class Login extends React.Component<IProps,IState>{
         const {register,history} = this.props;
         const {formRegister} = this.state;
 
-        if(!validUserName(formRegister.userName)) {
-            message.error('plz input correct email');
-            return false;
-        } else if(!validPass(formRegister.userPwd)) {
-            message.error('plz input correct pwd');
+        if(!validPass(formRegister.userPwd)) {
+            message.error('plz input pwd greater than 8 characters');
             return false;
         } else if(!validPass(formRegister.userPwd2) || (formRegister.userPwd2 !== formRegister.userPwd)) {
             message.error("pwd unmatch");
@@ -141,13 +142,20 @@ class Login extends React.Component<IProps,IState>{
         }
         register(
             formRegister.userName,
-            formRegister.userPwd2
+            formRegister.userPwd2,
+            formRegister.userAge,
+            formRegister.userSchool,
+            formRegister.userInterest,
         ) 
         .then((res:any) =>{
             if(res.code === 0) {
                 this.clearInput();
                 message.success('sign up ok');
                 history.push('/');
+            }
+            else {
+                this.clearInput();
+                message.error(res.msg);
             }
         })
         .catch((error:any)=>{
@@ -179,7 +187,12 @@ class Login extends React.Component<IProps,IState>{
             formRegister:{
                 userName:'',
                 userPwd:'',
-                userPwd2:''
+                userPwd2:'',
+                userAge:'',
+                userInterest:'',
+                userSchool:''
+                
+                
             }
         })
     }
@@ -203,7 +216,11 @@ class Login extends React.Component<IProps,IState>{
             formRegister:{
                 userName:type ===1 ? e.target.value : formRegister.userName,
                 userPwd:type ===2 ? e.target.value : formRegister.userPwd,
-                userPwd2:type ===3 ? e.target.value : formRegister.userPwd2
+                userPwd2:type ===3 ? e.target.value : formRegister.userPwd2,
+                userAge:type ===4 ? e.target.value : formRegister.userAge,
+                userSchool:type ===5 ? e.target.value : formRegister.userSchool,
+                userInterest:type ===6 ? e.target.value : formRegister.userInterest
+
             }
         })
     }
@@ -251,7 +268,7 @@ class Login extends React.Component<IProps,IState>{
                                         className="input"
                                         value={formLogin.userName}
                                         onChange={(e:any)=>this.handleChangeInput(e,1)}
-                                        placeholder="input email"
+                                        placeholder="input username"
                                     />
                                     <Input
                                     type="password"
@@ -279,7 +296,30 @@ class Login extends React.Component<IProps,IState>{
                                         className="input"
                                         value={ formRegister.userName }
                                         onChange={ (e: any) => this.handleChangeRegister(e, 1) }
-                                        placeholder="input email"
+                                        placeholder="input username"
+                                    />
+                                    
+
+                                    <Input
+                                        type="text"
+                                        className="input"
+                                        value={ formRegister.userAge }
+                                        onChange={ (e: any) => this.handleChangeRegister(e, 4) }
+                                        placeholder="input age"
+                                    />
+                                    <Input
+                                        type="text"
+                                        className="input"
+                                        value={ formRegister.userSchool }
+                                        onChange={ (e: any) => this.handleChangeRegister(e, 5) }
+                                        placeholder="input school"
+                                    />
+                                    <Input
+                                        type="text"
+                                        className="input"
+                                        value={ formRegister.userInterest }
+                                        onChange={ (e: any) => this.handleChangeRegister(e, 6) }
+                                        placeholder="input interests, use space to divide"
                                     />
                                     <Input
                                         type="password"

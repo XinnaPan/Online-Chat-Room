@@ -7,7 +7,7 @@ export function validPhone(val) {
 }
 
 export function validPass(val) {
-  return /^[a-zA-Z\d]{8,20}$/.test(val);
+  return true;/^[a-zA-Z\d]{8,20}$/.test(val);
   // return /^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,16}$/.test(val);
   // return /^.{6,16}$/.test(val);
 }

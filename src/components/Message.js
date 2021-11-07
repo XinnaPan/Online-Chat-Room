@@ -14,7 +14,7 @@ const Messages=({messages})=> {
           messages.map((item) => {
             return (
               <ul>
-              <Tooltip placement="topLeft" title="Prompt Text">
+              <Tooltip placement="topLeft" title="Recall">
                 <Button>{item}</Button>
               </Tooltip>
               </ul>

@@ -7,8 +7,8 @@ import { logout } from '@/redux/actions';
 axios.defaults.headers['Content-Type'] = 'application/json';
 axios.defaults.headers.post['Access-Control-Allow-Origin'] = '*';
 const service = axios.create({
-    baseURL: "https://nana-data-u.herokuapp.com",
-    //baseURL: "http://localhost:3030",
+    //baseURL: "https://nana-data-u.herokuapp.com",
+    baseURL: "http://localhost:4567",
     headers: {
         token: window.token
       }
@@ -29,7 +29,7 @@ service.interceptors.request.use(
 
 service.interceptors.response.use(
     response => {
-        console.log(response.data);
+        console.log("response.data====",response.data);
         if (response.data.code === 401 || response.data.code === 403) {
             console.log('log out');
             store.dispatch(logout());

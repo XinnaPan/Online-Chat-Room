@@ -5,9 +5,6 @@ import {Button,Select} from 'antd';
 const { Option } = Select;
 
 
-function onChange(value) {
-    console.log(`selected ${value}`);
-}
 
 function onBlur() {
     console.log('blur');
@@ -21,17 +18,20 @@ function onSearch(val) {
     console.log('search:', val);
 }
 
-const NewMessage = ({socket,addUser}) => {
+const NewMessage = ({UserList,socket}) => {
   
   const [value, setValue] = useState('');
- 
+  const [user, setUser] = useState('all');
  
   const submitForm = (e) => {
     e.preventDefault();
-    socket(value);
+    socket(value,user);
     setValue('');
   }
-
+  const onChange = (e) =>{
+    console.log("select value===",e);
+    setUser(e);
+  }
 
   
   return (  
@@ -52,8 +52,11 @@ const NewMessage = ({socket,addUser}) => {
             }
         >
             <Option value="all">All Users</Option>
-            <Option value="lucy">Lucy</Option>
-            <Option value="tom">Tom</Option>
+            {
+              UserList?.map((item,index)=>{
+                return (<Option value={item}>{item}</Option>  )
+              })
+            }
         </Select>
 
         <Button className="chatroom-area-send-button" type="primary" onClick={submitForm}>Send</Button>
