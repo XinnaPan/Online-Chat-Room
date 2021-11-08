@@ -4,7 +4,41 @@ import {Button,Select} from 'antd';
 
 const { Option } = Select;
 
+const emojiOptions = [
+    {
+        label:"😊",
+        value:"😊",
+    },
+    {
+        label:'😭',
+        value:'😭',
+    },
+    {
+        label:'🤩',
+        value:'🤩',
+    },
+    {
+        label:'😅',
+        value:'😅'
+    },
+    {
+        label:'😉',
+        value:'😉'
+    },
+    {
+        label:'😍',
+        value:'😍'
+    },
+    {
+        label:'😕',
+        value:'😕'
+    },
+    {
+        label:'🤓',
+        value:'🤓'
+    },
 
+];
 
 function onBlur() {
     console.log('blur');
@@ -32,12 +66,16 @@ const NewMessage = ({UserList,socket}) => {
     console.log("select value===",e);
     setUser(e);
   }
+  const handleEmojiChange=(e)=>{
+    let m=value;
+    m=m+e;
+    setValue(m);
+  }
 
   
   return (  
     <div className="chatroom-area-send-container">
       <div className="chatroom-area-send-user">
-      
         <span><b>Send to:</b></span>
         <Select
             showSearch
@@ -59,6 +97,17 @@ const NewMessage = ({UserList,socket}) => {
               })
             }
         </Select>
+          <span><b>Emoji</b></span>
+          <Select
+              //value={emojiOptions}
+              onChange={handleEmojiChange}
+          >
+              {
+                  emojiOptions.map((option) => {
+                    return( <option value={option.value}>{option.label}</option>)
+                  })
+              }
+          </Select>
 
         <Button className="chatroom-area-send-button" type="primary" onClick={submitForm}>Send</Button>
       </div>

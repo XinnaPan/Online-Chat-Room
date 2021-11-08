@@ -97,7 +97,7 @@ class Home extends React.Component<any,any> {
                 let datas=JSON.parse(res.data);
                  this.setState({userName:datas.userName});
                  this.setState({userAge:datas.age});
-                 this.setState({userSchoole:datas.school});
+                 this.setState({userSchool:datas.school});
                  this.setState({userInterest:eval(datas.interest)});
 
               }
@@ -135,8 +135,8 @@ class Home extends React.Component<any,any> {
     
 
     SocketChatRoom=()=> {
-        const webSocket = new WebSocket('wss://unicorn-server.herokuapp.com/chatapp?userId=1');
-        //const webSocket = new WebSocket('ws://localhost:4567/chatapp?userId=1');
+        //const webSocket = new WebSocket('wss://unicorn-server.herokuapp.com/chatapp?userId=1');
+        const webSocket = new WebSocket('ws://localhost:4567/chatapp?userId=1');
         
         this.setState({webSocket:webSocket});
         this.setUpSession(webSocket);
