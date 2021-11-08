@@ -135,8 +135,8 @@ class Home extends React.Component<any,any> {
     
 
     SocketChatRoom=()=> {
-        //const webSocket = new WebSocket('wss://unicorn-server.herokuapp.com/chatapp?userId=1');
-        const webSocket = new WebSocket('ws://localhost:4567/chatapp?userId=1');
+        const webSocket = new WebSocket('wss://unicorn-server.herokuapp.com/chatapp?userId=1');
+        //const webSocket = new WebSocket('ws://localhost:4567/chatapp?userId=1');
         
         this.setState({webSocket:webSocket});
         this.setUpSession(webSocket);
