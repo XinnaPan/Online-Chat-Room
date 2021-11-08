@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import '@/layout/home.less';
 import {Button,Select} from 'antd';
-import Emoticons from 'react-native-emoticons';
 
 const { Option } = Select;
 
@@ -60,12 +59,7 @@ const NewMessage = ({UserList,socket}) => {
               })
             }
         </Select>
-        <Emoticons
-          show={yes}
-          concise={true}
-          showHistoryBar={true}
-          showPlusBar={true}
-          />
+
         <Button className="chatroom-area-send-button" type="primary" onClick={submitForm}>Send</Button>
       </div>
       <textarea className="chatroom-area-send-content" placeholder="type your message"  value={value} onChange={(e) => {
