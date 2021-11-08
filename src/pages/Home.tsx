@@ -13,6 +13,7 @@ import {logout,getUserInfo,checkBan,banUser,CheckAdmin,
     getRooms,LeaveAllRooms,recallMessage} from '@/redux/actions';
 import store from "@/redux";
 import {validNumber} from "@/utils/valid"
+import Emoticons from 'react-native-emoticons';
 //import {logout} from "@/redux/actions"
 //import io from 'socket.io-client'
 //import { ServerResponse } from 'http';
@@ -134,8 +135,8 @@ class Home extends React.Component<any,any> {
     
 
     SocketChatRoom=()=> {
-        //const webSocket = new WebSocket('wss://unicorn-server.herokuapp.com/chatapp?userId=1');
-        const webSocket = new WebSocket('ws://localhost:4567/chatapp?userId=1');
+        const webSocket = new WebSocket('wss://unicorn-server.herokuapp.com/chatapp?userId=1');
+        //const webSocket = new WebSocket('ws://localhost:4567/chatapp?userId=1');
         
         this.setState({webSocket:webSocket});
         this.setUpSession(webSocket);

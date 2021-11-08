@@ -7,8 +7,8 @@ import { logout } from '@/redux/actions';
 axios.defaults.headers['Content-Type'] = 'application/json';
 axios.defaults.headers.post['Access-Control-Allow-Origin'] = '*';
 const service = axios.create({
-    //baseURL: " https://unicorn-server.herokuapp.com/",
-    baseURL: "http://localhost:4567",
+    baseURL: " https://unicorn-server.herokuapp.com/",
+    //baseURL: "http://localhost:4567",
     headers: {
         token: window.token
       }
