@@ -141,3 +141,14 @@ export function log_out(data) {
     }
   )
 }
+
+export function recall_message(data) {
+  return network(
+    {
+      url:`/recallMessage`,
+      method:"post",
+      data
+    }
+  )
+}
+

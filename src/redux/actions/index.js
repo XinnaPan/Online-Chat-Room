@@ -1,4 +1,7 @@
-import{getUserInfo,checkBan,login,register,logout,getJoinedRooms,createNewRoom,JoinARoom,GetRoomUser, LeaveRoom,getRooms,LeaveAllRooms,CheckAdmin,banUser} from './auth'
+import{recallMessage,getUserInfo,
+    checkBan,login,register,logout,getJoinedRooms,
+    createNewRoom,JoinARoom,GetRoomUser, LeaveRoom,getRooms,
+    LeaveAllRooms,CheckAdmin,banUser} from './auth'
 import{saveUserInfo,clearUserInfo,saveUserJoinedRooms,saveNoInfo,saveUserInRoom} from './user'
 
 export {
@@ -21,5 +24,6 @@ export {
     CheckAdmin,
     banUser,
     checkBan,
-    getUserInfo
+    getUserInfo,
+    recallMessage
 }

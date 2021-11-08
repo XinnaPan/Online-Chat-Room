@@ -62,7 +62,7 @@ const Messages=({messages,user,recall})=> {
                 )
               } 
 
-              <Modal title="Create New Room" visible={isModalVisible} onOk={handleRecallOk} onCancel={handleRecallCancel}>
+              <Modal title="Recall Message" visible={isModalVisible} onOk={handleRecallOk} onCancel={handleRecallCancel}>
                 <label>Sure to recall?</label>
               </Modal>
               </ul>

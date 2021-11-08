@@ -8,7 +8,9 @@ import MessageInput from '@/components/MessageInput';
 import Message from '@/components/Message';
 import { StopOutlined, CloseCircleOutlined, UserOutlined } from '@ant-design/icons';
 import {connect} from 'react-redux';
-import {logout,getUserInfo,checkBan,banUser,CheckAdmin,getJoinedRooms,createNewRoom,GetRoomUser, JoinARoom,LeaveRoom,getRooms,LeaveAllRooms} from '@/redux/actions';
+import {logout,getUserInfo,checkBan,banUser,CheckAdmin,
+    getJoinedRooms,createNewRoom,GetRoomUser, JoinARoom,LeaveRoom,
+    getRooms,LeaveAllRooms,recallMessage} from '@/redux/actions';
 import store from "@/redux";
 import {validNumber} from "@/utils/valid"
 //import {logout} from "@/redux/actions"
@@ -59,9 +61,17 @@ class Home extends React.Component<any,any> {
     }
 
     handleRecall=(value)=>{
-        let mm=this.state.messages;
+        /*let mm=this.state.messages;
         mm.splice(mm.indexOf(value),1);
-        this.setState({messages:mm});
+        this.setState({messages:mm});*/
+        const {recallMessage} = this.props;
+        recallMessage(this.state.room_title,value,this.state.user)
+        .then((res:any)=>{
+              message.success("recall message success");
+
+        }).catch((error:any)=>{
+            message.error(error);
+        })
 
     }
 
@@ -71,7 +81,7 @@ class Home extends React.Component<any,any> {
               <div>
                 <p>{`Name: ${this.state.userName}`}</p>
                 <p>{`Age: ${this.state.userAge}`}</p>
-                <p>{`Schoole: ${this.state.userSchool}`}</p>
+                <p>{`School: ${this.state.userSchool}`}</p>
                 <p>{`Interest: ${this.state.userInterest}`}</p>
                 
               </div>
@@ -124,7 +134,9 @@ class Home extends React.Component<any,any> {
     
 
     SocketChatRoom=()=> {
-        const webSocket = new WebSocket('wss://unicorn-server.herokuapp.com/chatapp?userId=1');
+        //const webSocket = new WebSocket('wss://unicorn-server.herokuapp.com/chatapp?userId=1');
+        const webSocket = new WebSocket('ws://localhost:4567/chatapp?userId=1');
+        
         this.setState({webSocket:webSocket});
         this.setUpSession(webSocket);
         webSocket.onmessage = (msg) =>{this.handleMessageFromServer(msg);}//{console.log("msg from server===== ",msg);}//{this.store_messages(JSON.parse(msg.data))};//this.store_messages( JSON.parse(msg.data).userName + " leave the room");
@@ -182,20 +194,23 @@ class Home extends React.Component<any,any> {
             {
                 //this.store_messages(`${sender} ${message}`);
                 message.success(`${sender} ${mm}`);
-                if (this.state.user !== sender) {
+                //if (this.state.user !== sender) {
                     let ar = this.state.allRoomCardList;
                     ar.push(chatroom);
                     this.setState({ allRoomCardList: ar });
-                }
+                //}
             } else if(topic === "JoinRoom")
             {
                 //if (this.state.room_title === chatroom)
                   //  this.store_messages(sender + " leaves " + chatroom+","+ mm);
-                if((this.state.user === sender)&&(!this.state.joinedRoomCardList.includes(chatroom))){
+                //happen in invite;
+                  if((this.state.user === sender)&&(this.state.joinedRoomCardList.findIndex(e=>e===chatroom) === -1)){
                     let jr=this.state.joinedRoomCardList;
                     jr.push(chatroom);
                     this.setState({joinedRoomCardList:jr});
                 }
+
+                //user in the room
                 if(this.state.room_title === chatroom)
                 {
                     let ic=this.state.inviteUserCardList;
@@ -204,6 +219,17 @@ class Home extends React.Component<any,any> {
                         inviteUserCardList: ic
                     })
                 }
+            } else if (topic === 'RecallMessage') {
+
+                if (this.state.room_title === chatroom) {
+                    let value = this.state.messages;
+                    value.splice(value.indexOf(mm), 1);
+                    value.push(`${sender} recalled a message`);
+                    this.setState({ messages: value });
+
+                    
+                }
+
             }
         }
     }
@@ -307,41 +333,34 @@ class Home extends React.Component<any,any> {
     handleNewRoomOk = () => {
         const {createNewRoom} = this.props;
 
-        let datajoinedRooms = this.state.joinedRoomCardList;
-        datajoinedRooms.push(this.formRef.current.getFieldsValue().newchatroomName);
-        
-
         let infoNewRoom=this.formRef.current.getFieldsValue();
         console.log(infoNewRoom.newchatroomType);        
         if(!validNumber(infoNewRoom.newchatroomSize)) {
             message.error('the size should be a number');
             return false;
         }
-        
+        let datajoinedRooms = this.state.joinedRoomCardList;
         createNewRoom(infoNewRoom.newchatroomName,infoNewRoom.newchatroomType,
             infoNewRoom.newchatroomSize,infoNewRoom.newchatroomDescription,this.state.user)
         .then((res:any)=>{
             if(res.code === 0) {
                 message.success('create a room success');
-                //console.log(">>>>>",typeof(res.data));
+                console.log("create a room success")
+                datajoinedRooms.push(infoNewRoom.newchatroomName);
+                this.setState({joinedRoomCardList: datajoinedRooms
+                })
             }
         })
         .catch((error:any)=>{
             message.error(error);
         })
 
-        let dataallRooms = this.state.allRoomCardList;
 
-        if(infoNewRoom.newchatroomType==='PUBLIC')
-        {
-            console.log("add room to all rooms.")
-            dataallRooms.push(infoNewRoom.newchatroomName)
-        }
+        
         
         this.setState({
             isModalVisible: false,
-            joinedRoomCardList: datajoinedRooms,
-            allRoomCardList: dataallRooms
+            joinedRoomCardList: datajoinedRooms
         })
         this.formRef.current.resetFields()
     }
@@ -391,7 +410,7 @@ class Home extends React.Component<any,any> {
             this.setState({joinedRoomCardList:dataJoinedRooms,inviteUserCardList:[],messages:[]});
             this.setRoomNotification("");
 
-            LeaveRoom(this.state.user, item,"user clicked LEAVE button")
+            LeaveRoom(this.state.user, item,"user chooses to LEAVE.")
             .then((res:any)=>
             {
                 if(res.code===0)
@@ -411,7 +430,7 @@ class Home extends React.Component<any,any> {
     }
 
     deleteAllRoom = () => {
-        const{LeaveAllRooms} = this.props;
+        /*const{LeaveAllRooms} = this.props;
 
         LeaveAllRooms(this.state.user)
         .then((res:any)=>
@@ -434,7 +453,11 @@ class Home extends React.Component<any,any> {
         messages:messages})
 
         this.setRoomTitle("");
-        this.setRoomNotification("");
+        this.setRoomNotification("");*/
+        let inroom=JSON.parse(JSON.stringify(this.state.joinedRoomCardList));
+        inroom.forEach(e => {
+            this.deleteJoinedRoom(e);
+        });
 
     }
 
@@ -808,6 +831,6 @@ class Home extends React.Component<any,any> {
         
     }
 }
-export default connect((state: any) => state.user, {logout,getUserInfo,checkBan, banUser,CheckAdmin,LeaveAllRooms,LeaveRoom,JoinARoom,getRooms,getJoinedRooms,createNewRoom,GetRoomUser })(Home)
+export default connect((state: any) => state.user, {recallMessage,logout,getUserInfo,checkBan, banUser,CheckAdmin,LeaveAllRooms,LeaveRoom,JoinARoom,getRooms,getJoinedRooms,createNewRoom,GetRoomUser })(Home)
 
 //export default Home;//

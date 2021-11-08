@@ -1,5 +1,6 @@
 import{ saveUserInfo, clearUserInfo,saveUserJoinedRooms,saveNoInfo,saveUserInRoom } from './user';
-import{log_out,get_user_info,check_ban,check_user_admin,loginUser,registerUser,getJoinedRoomsById,create_new_room,join_a_room,connect_a_room,leave_a_room,get_all_rooms,leave_all_rooms,ban_user} from '@/utils/api';
+import{recall_message,log_out,get_user_info,check_ban,check_user_admin,loginUser,registerUser,getJoinedRoomsById,create_new_room,join_a_room,connect_a_room,leave_a_room,
+    get_all_rooms,leave_all_rooms,ban_user} from '@/utils/api';
 
 export const login = (username, password) => (dispatch) => {
     return new Promise((resolve,reject) => {
@@ -215,3 +216,19 @@ export const getUserInfo=(username) => (dispatch)=> {
         })
     })
 }
+
+export const recallMessage=(name,mm,user) => (dispatch)=> {
+    return new Promise((resolve,reject) => {
+        recall_message({roomName:name,message:mm,userName:user})
+        .then(res=>{
+            console.log('recall message ===',res)
+            if(res.code === 0) {
+                dispatch(saveNoInfo());
+                resolve(res);
+            } else {
+                reject(res.msg);
+            }
+        })
+    })
+}
+
